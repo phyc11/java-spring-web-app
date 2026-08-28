@@ -1,13 +1,13 @@
-import { ApiService } from './api.js';
-import { renderNavbar } from './components/Navbar.js';
-import { renderStatsCards } from './components/StatsCard.js';
-import { renderTaskFilter } from './components/TaskFilter.js';
-import { renderTaskCard } from './components/TaskCard.js';
-import { renderKanbanBoard } from './components/KanbanBoard.js';
-import { renderTaskModal } from './components/TaskModal.js';
-import { renderAuthModal } from './components/AuthModal.js';
-import { renderAuditLogDrawer } from './components/AuditLogDrawer.js';
-import { renderChartDashboard } from './components/ChartDashboard.js';
+import { ApiService } from './core/api.js';
+import { renderNavbar } from './core/Navbar.js';
+import { renderStatsCards } from './modules/task/StatsCard.js';
+import { renderTaskFilter } from './modules/task/TaskFilter.js';
+import { renderTaskCard } from './modules/task/TaskCard.js';
+import { renderTaskModal } from './modules/task/TaskModal.js';
+import { renderKanbanBoard } from './modules/kanban/KanbanBoard.js';
+import { renderAuthModal } from './modules/auth/AuthModal.js';
+import { renderAuditLogDrawer } from './modules/audit/AuditLogDrawer.js';
+import { renderChartDashboard } from './modules/analytics/ChartDashboard.js';
 
 class Application {
     constructor() {
