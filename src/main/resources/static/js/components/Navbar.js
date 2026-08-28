@@ -1,7 +1,7 @@
 /**
- * Navbar Component with Auth User Info, View Switcher, and Audit Log button
+ * Navbar Component with View Switcher, Audit Log Drawer, Analytics Dashboard, and Auth Profile
  */
-export function renderNavbar({ currentUser, currentView, onViewChange, onNewTaskClick, onAuditLogClick, onAuthClick, onLogoutClick }) {
+export function renderNavbar({ currentUser, currentView, onViewChange, onNewTaskClick, onAuditLogClick, onAnalyticsClick, onAuthClick, onLogoutClick }) {
     const header = document.createElement('header');
     header.className = 'header-navbar';
 
@@ -10,7 +10,7 @@ export function renderNavbar({ currentUser, currentView, onViewChange, onNewTask
             <div class="brand-icon">TC</div>
             <div>
                 <span class="brand-title">TaskCraft</span>
-                <span class="brand-badge">Spring Boot + Audit Log</span>
+                <span class="brand-badge">Full Stack System</span>
             </div>
         </div>
 
@@ -29,6 +29,9 @@ export function renderNavbar({ currentUser, currentView, onViewChange, onNewTask
             ${currentUser ? `
                 <button class="btn btn-secondary btn-sm" id="btn-audit-log" title="Xem lịch sử hoạt động system">
                     📜 Lịch Sử
+                </button>
+                <button class="btn btn-secondary btn-sm" id="btn-analytics" title="Xem biểu đồ phân tích & xuất báo cáo Excel/CSV">
+                    📈 Analytics & Báo Cáo
                 </button>
                 <div class="user-profile-badge">
                     <span class="user-avatar">👤</span>
@@ -59,6 +62,7 @@ export function renderNavbar({ currentUser, currentView, onViewChange, onNewTask
 
     if (currentUser) {
         header.querySelector('#btn-audit-log').addEventListener('click', onAuditLogClick);
+        header.querySelector('#btn-analytics').addEventListener('click', onAnalyticsClick);
         header.querySelector('#btn-create-task').addEventListener('click', onNewTaskClick);
         header.querySelector('#btn-logout').addEventListener('click', onLogoutClick);
     } else {

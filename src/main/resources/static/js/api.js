@@ -1,6 +1,6 @@
 /**
  * TaskCraft API Service Module
- * Handles REST API calls, JWT Bearer token authentication, and Audit Logs
+ * Handles REST API calls, JWT Bearer token authentication, Audit Logs, Analytics & File Export
  */
 const API_BASE = '/api';
 
@@ -82,6 +82,31 @@ export const ApiService = {
         const res = await fetch(`${API_BASE}/audit-logs`, { headers: this.getHeaders() });
         const json = await res.json();
         return json.data || [];
+    },
+
+    // Analytics & Export Endpoints
+    async getAnalytics() {
+        const res = await fetch(`${API_BASE}/analytics`, { headers: this.getHeaders() });
+        const json = await res.json();
+        return json.data || null;
+    },
+
+    async downloadExport(format = 'excel') {
+        const token = this.getToken();
+        const url = `${API_BASE}/export/${format}`;
+        
+        const response = await fetch(url, {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `TaskCraft_Report.${format === 'excel' ? 'xlsx' : 'csv'}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
     },
 
     // Task Endpoints
