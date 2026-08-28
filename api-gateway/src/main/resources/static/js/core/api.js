@@ -1,6 +1,6 @@
 /**
  * Core API Service Module
- * Handles REST API calls, JWT Bearer token authentication, Profile & Password management, Analytics & File Export
+ * Handles REST API calls, JWT Bearer token authentication, Profile & Password management, Notifications, Comments, Analytics & File Export
  */
 const API_BASE = '/api';
 
@@ -93,6 +93,70 @@ export const ApiService = {
 
     logout() {
         this.setToken(null);
+    },
+
+    // Comment Endpoints
+    async getTaskComments(taskId) {
+        const res = await fetch(`${API_BASE}/comments/task/${taskId}`, { headers: this.getHeaders() });
+        const json = await res.json();
+        return json.data || [];
+    },
+
+    async postComment({ taskId, content, parentId = null }) {
+        const res = await fetch(`${API_BASE}/comments`, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify({ taskId, content, parentId })
+        });
+        const json = await res.json();
+        return json.data;
+    },
+
+    async deleteComment(id) {
+        const res = await fetch(`${API_BASE}/comments/${id}`, {
+            method: 'DELETE',
+            headers: this.getHeaders()
+        });
+        const json = await res.json();
+        return json.success;
+    },
+
+    // Notification Endpoints
+    async getNotifications() {
+        const res = await fetch(`${API_BASE}/notifications`, { headers: this.getHeaders() });
+        const json = await res.json();
+        return json.data || [];
+    },
+
+    async getUnreadNotificationCount() {
+        const res = await fetch(`${API_BASE}/notifications/unread-count`, { headers: this.getHeaders() });
+        const json = await res.json();
+        return json.data ? json.data.unreadCount : 0;
+    },
+
+    async markNotificationAsRead(id) {
+        const res = await fetch(`${API_BASE}/notifications/${id}/read`, {
+            method: 'PATCH',
+            headers: this.getHeaders()
+        });
+        return await res.json();
+    },
+
+    async markAllNotificationsAsRead() {
+        const res = await fetch(`${API_BASE}/notifications/read-all`, {
+            method: 'POST',
+            headers: this.getHeaders()
+        });
+        return await res.json();
+    },
+
+    async sendTestNotification(title, message, type = 'SYSTEM') {
+        const res = await fetch(`${API_BASE}/notifications/send`, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify({ title, message, type })
+        });
+        return await res.json();
     },
 
     // Analytics & Export Endpoints

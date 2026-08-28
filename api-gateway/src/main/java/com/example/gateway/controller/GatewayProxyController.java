@@ -25,11 +25,17 @@ public class GatewayProxyController {
     @Value("${analytics-service.url:http://localhost:8084}")
     private String analyticsServiceUrl;
 
+    @Value("${notification-service.url:http://localhost:8085}")
+    private String notificationServiceUrl;
+
+    @Value("${comment-service.url:http://localhost:8087}")
+    private String commentServiceUrl;
+
     public GatewayProxyController(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    @RequestMapping({"/api/auth/**", "/api/tasks/**", "/api/categories/**", "/api/analytics/**", "/api/export/**"})
+    @RequestMapping({"/api/auth/**", "/api/tasks/**", "/api/categories/**", "/api/analytics/**", "/api/export/**", "/api/notifications/**", "/api/comments/**"})
     public ResponseEntity<byte[]> proxyRequest(@RequestBody(required = false) byte[] body,
                                               HttpMethod method,
                                               HttpServletRequest request) {
@@ -44,6 +50,10 @@ public class GatewayProxyController {
             targetBaseUrl = authServiceUrl;
         } else if (requestPath.startsWith("/api/tasks") || requestPath.startsWith("/api/categories")) {
             targetBaseUrl = taskServiceUrl;
+        } else if (requestPath.startsWith("/api/notifications")) {
+            targetBaseUrl = notificationServiceUrl;
+        } else if (requestPath.startsWith("/api/comments")) {
+            targetBaseUrl = commentServiceUrl;
         } else {
             targetBaseUrl = analyticsServiceUrl;
         }

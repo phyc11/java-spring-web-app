@@ -1,9 +1,11 @@
+import { createCommentSection } from '../comment/CommentSection.js';
+
 export function renderTaskModal(categories = [], onSave) {
     const modal = document.createElement('div');
     modal.className = 'modal-overlay';
 
     modal.innerHTML = `
-        <div class="modal-container">
+        <div class="modal-container" style="max-width: 640px; width: 95%;">
             <h3 id="modal-title" style="margin-bottom:1.25rem; font-size:1.2rem; font-weight:700">Tạo Task Mới</h3>
             <form id="task-form">
                 <input type="hidden" id="task-id">
@@ -54,7 +56,10 @@ export function renderTaskModal(categories = [], onSave) {
                     </div>
                 </div>
 
-                <div class="modal-footer">
+                <!-- Comment Section Slot -->
+                <div id="comment-section-slot"></div>
+
+                <div class="modal-footer" style="margin-top:20px;">
                     <button type="button" class="btn btn-secondary" id="modal-cancel-btn">Hủy Bỏ</button>
                     <button type="submit" class="btn btn-primary" id="modal-save-btn">Lưu Task</button>
                 </div>
@@ -64,6 +69,7 @@ export function renderTaskModal(categories = [], onSave) {
 
     const form = modal.querySelector('#task-form');
     const cancelBtn = modal.querySelector('#modal-cancel-btn');
+    const commentSlot = modal.querySelector('#comment-section-slot');
 
     const closeModal = () => modal.classList.remove('active');
     cancelBtn.addEventListener('click', closeModal);
@@ -99,6 +105,7 @@ export function renderTaskModal(categories = [], onSave) {
         element: modal,
         open: (taskData = null) => {
             modal.classList.add('active');
+            commentSlot.innerHTML = '';
             if (taskData) {
                 modal.querySelector('#modal-title').textContent = 'Chỉnh Sửa Task';
                 modal.querySelector('#task-id').value = taskData.id;
@@ -108,6 +115,10 @@ export function renderTaskModal(categories = [], onSave) {
                 modal.querySelector('#task-priority-select').value = taskData.priority || 'MEDIUM';
                 modal.querySelector('#task-category-select').value = taskData.categoryId || '';
                 modal.querySelector('#task-duedate-input').value = taskData.dueDate ? taskData.dueDate.substring(0, 16) : '';
+
+                // Embed Comment Section for existing task
+                const commentSec = createCommentSection(taskData.id);
+                commentSlot.appendChild(commentSec.element);
             } else {
                 modal.querySelector('#modal-title').textContent = 'Tạo Task Mới';
                 form.reset();
