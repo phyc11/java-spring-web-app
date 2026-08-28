@@ -25,12 +25,17 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository, CategoryRepository categoryRepository, UserRepository userRepository) {
+    public TaskService(TaskRepository taskRepository,
+                       CategoryRepository categoryRepository,
+                       UserRepository userRepository,
+                       AuditLogService auditLogService) {
         this.taskRepository = taskRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.auditLogService = auditLogService;
     }
 
     public List<TaskDTO> filterTasks(Status status, Priority priority, Long categoryId, String search, String username) {
@@ -71,6 +76,18 @@ public class TaskService {
         }
 
         Task saved = taskRepository.save(task);
+
+        // Record Audit Log
+        auditLogService.recordLog(
+                "CREATE",
+                "TASK",
+                saved.getId(),
+                "Tạo mới công việc '" + saved.getTitle() + "'",
+                null,
+                "Status: " + saved.getStatus() + " | Priority: " + saved.getPriority(),
+                username
+        );
+
         return convertToDTO(saved);
     }
 
@@ -79,6 +96,8 @@ public class TaskService {
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found with ID: " + id));
 
         checkTaskPermission(task, username);
+
+        String oldState = "Title: " + task.getTitle() + " | Status: " + task.getStatus() + " | Priority: " + task.getPriority();
 
         if (dto.getTitle() != null) task.setTitle(dto.getTitle());
         if (dto.getDescription() != null) task.setDescription(dto.getDescription());
@@ -94,6 +113,19 @@ public class TaskService {
         }
 
         Task updated = taskRepository.save(task);
+        String newState = "Title: " + updated.getTitle() + " | Status: " + updated.getStatus() + " | Priority: " + updated.getPriority();
+
+        // Record Audit Log
+        auditLogService.recordLog(
+                "UPDATE",
+                "TASK",
+                updated.getId(),
+                "Chỉnh sửa công việc '" + updated.getTitle() + "'",
+                oldState,
+                newState,
+                username
+        );
+
         return convertToDTO(updated);
     }
 
@@ -102,8 +134,21 @@ public class TaskService {
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found with ID: " + id));
 
         checkTaskPermission(task, username);
+        Status oldStatus = task.getStatus();
         task.setStatus(status);
         Task updated = taskRepository.save(task);
+
+        // Record Audit Log
+        auditLogService.recordLog(
+                "STATUS_CHANGE",
+                "TASK",
+                updated.getId(),
+                "Đổi trạng thái task '" + updated.getTitle() + "' từ " + oldStatus + " ➔ " + status,
+                oldStatus.name(),
+                status.name(),
+                username
+        );
+
         return convertToDTO(updated);
     }
 
@@ -113,6 +158,9 @@ public class TaskService {
 
         checkTaskPermission(task, username);
 
+        Status oldStatus = task.getStatus();
+        Integer oldPosition = task.getPosition();
+
         if (targetStatus != null) {
             task.setStatus(targetStatus);
         }
@@ -121,6 +169,18 @@ public class TaskService {
         }
 
         Task updated = taskRepository.save(task);
+
+        // Record Audit Log
+        auditLogService.recordLog(
+                "MOVE",
+                "TASK",
+                updated.getId(),
+                "Kéo thả Task '" + updated.getTitle() + "' sang cột " + updated.getStatus(),
+                "Status: " + oldStatus + ", Pos: " + oldPosition,
+                "Status: " + updated.getStatus() + ", Pos: " + updated.getPosition(),
+                username
+        );
+
         return convertToDTO(updated);
     }
 
@@ -129,7 +189,19 @@ public class TaskService {
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found with ID: " + id));
 
         checkTaskPermission(task, username);
+        String taskTitle = task.getTitle();
         taskRepository.deleteById(id);
+
+        // Record Audit Log
+        auditLogService.recordLog(
+                "DELETE",
+                "TASK",
+                id,
+                "Xóa công việc '" + taskTitle + "'",
+                "Task ID: " + id + ", Title: " + taskTitle,
+                "DELETED",
+                username
+        );
     }
 
     public TaskStatsDTO getStats(String username) {

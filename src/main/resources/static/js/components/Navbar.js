@@ -1,7 +1,7 @@
 /**
- * Navbar Component with Auth User Info & View Switcher
+ * Navbar Component with Auth User Info, View Switcher, and Audit Log button
  */
-export function renderNavbar({ currentUser, currentView, onViewChange, onNewTaskClick, onAuthClick, onLogoutClick }) {
+export function renderNavbar({ currentUser, currentView, onViewChange, onNewTaskClick, onAuditLogClick, onAuthClick, onLogoutClick }) {
     const header = document.createElement('header');
     header.className = 'header-navbar';
 
@@ -10,7 +10,7 @@ export function renderNavbar({ currentUser, currentView, onViewChange, onNewTask
             <div class="brand-icon">TC</div>
             <div>
                 <span class="brand-title">TaskCraft</span>
-                <span class="brand-badge">Spring Boot + JWT</span>
+                <span class="brand-badge">Spring Boot + Audit Log</span>
             </div>
         </div>
 
@@ -27,6 +27,9 @@ export function renderNavbar({ currentUser, currentView, onViewChange, onNewTask
 
         <div class="navbar-actions">
             ${currentUser ? `
+                <button class="btn btn-secondary btn-sm" id="btn-audit-log" title="Xem lịch sử hoạt động system">
+                    📜 Lịch Sử
+                </button>
                 <div class="user-profile-badge">
                     <span class="user-avatar">👤</span>
                     <div class="user-details">
@@ -55,6 +58,7 @@ export function renderNavbar({ currentUser, currentView, onViewChange, onNewTask
     header.querySelector('#btn-view-kanban').addEventListener('click', () => onViewChange('kanban'));
 
     if (currentUser) {
+        header.querySelector('#btn-audit-log').addEventListener('click', onAuditLogClick);
         header.querySelector('#btn-create-task').addEventListener('click', onNewTaskClick);
         header.querySelector('#btn-logout').addEventListener('click', onLogoutClick);
     } else {

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TaskCraft - Modern Component-Based Web UI Stylesheet with Kanban & Auth
+   TaskCraft - Modern Component-Based Web UI Stylesheet with Kanban, Auth & Audit Drawer
    ========================================================================== */
 
 :root {
@@ -20,6 +20,7 @@
     --accent-amber: #f59e0b;
     --accent-red: #ef4444;
     --accent-blue: #3b82f6;
+    --accent-purple: #8b5cf6;
 
     --text-main: #f3f4f6;
     --text-muted: #9ca3af;
@@ -715,4 +716,178 @@ body {
 .empty-state-icon {
     font-size: 3rem;
     margin-bottom: 1rem;
+}
+
+/* ==========================================================================
+   Audit Log Slide-Out Drawer Styles
+   ========================================================================== */
+.audit-drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1200;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.audit-drawer-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.audit-drawer-container {
+    width: 100%;
+    max-width: 480px;
+    height: 100%;
+    background: var(--bg-modal);
+    border-left: 1px solid var(--border-color);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.audit-drawer-overlay.active .audit-drawer-container {
+    transform: translateX(0);
+}
+
+.audit-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.audit-header-title h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.audit-subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.audit-drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+/* Audit Timeline */
+.audit-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    position: relative;
+}
+
+.audit-timeline::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 18px;
+    width: 2px;
+    background: var(--border-color);
+}
+
+.audit-timeline-item {
+    display: flex;
+    gap: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.audit-timeline-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    background: var(--bg-input);
+    border: 2px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.audit-timeline-content {
+    flex: 1;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.audit-item-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.audit-action-tag {
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.action-create { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border-color: rgba(16, 185, 129, 0.3); }
+.action-update { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.3); }
+.action-status { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); border-color: rgba(245, 158, 11, 0.3); }
+.action-move { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); border-color: rgba(139, 92, 246, 0.3); }
+.action-delete { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); border-color: rgba(239, 68, 68, 0.3); }
+.action-default { background: rgba(156, 163, 175, 0.15); color: var(--text-muted); }
+
+.audit-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.audit-details {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.audit-state-box {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.state-label {
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.audit-performer {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    padding-top: 0.2rem;
+    border-top: 1px dashed rgba(255, 255, 255, 0.05);
+}
+
+.audit-loading,
+.audit-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
 }

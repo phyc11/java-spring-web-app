@@ -1,6 +1,6 @@
 /**
  * TaskCraft API Service Module
- * Handles REST API calls and JWT Bearer token authentication
+ * Handles REST API calls, JWT Bearer token authentication, and Audit Logs
  */
 const API_BASE = '/api';
 
@@ -75,6 +75,13 @@ export const ApiService = {
 
     logout() {
         this.setToken(null);
+    },
+
+    // Audit Log Endpoints
+    async getAuditLogs() {
+        const res = await fetch(`${API_BASE}/audit-logs`, { headers: this.getHeaders() });
+        const json = await res.json();
+        return json.data || [];
     },
 
     // Task Endpoints

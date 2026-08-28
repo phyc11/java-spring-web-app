@@ -6,12 +6,13 @@ import { renderTaskCard } from './components/TaskCard.js';
 import { renderKanbanBoard } from './components/KanbanBoard.js';
 import { renderTaskModal } from './components/TaskModal.js';
 import { renderAuthModal } from './components/AuthModal.js';
+import { renderAuditLogDrawer } from './components/AuditLogDrawer.js';
 
 class Application {
     constructor() {
         this.appContainer = document.getElementById('app');
         this.currentUser = null;
-        this.currentView = 'kanban'; // Default to Kanban view!
+        this.currentView = 'kanban';
         this.categories = [];
         this.tasks = [];
         this.stats = {};
@@ -23,7 +24,7 @@ class Application {
             // Check Auth Token & Current User
             this.currentUser = await ApiService.getMe();
 
-            // Initialize Modals
+            // Initialize Modals & Drawers
             this.authModal = renderAuthModal({
                 onLoginSuccess: (user) => {
                     this.currentUser = user;
@@ -31,6 +32,9 @@ class Application {
                 }
             });
             document.body.appendChild(this.authModal.element);
+
+            this.auditLogDrawer = renderAuditLogDrawer();
+            document.body.appendChild(this.auditLogDrawer.element);
 
             this.categories = await ApiService.getCategories();
 
@@ -64,6 +68,7 @@ class Application {
                 this.renderContent();
             },
             onNewTaskClick: () => this.taskModal.open(),
+            onAuditLogClick: () => this.auditLogDrawer.open(),
             onAuthClick: () => this.authModal.open(),
             onLogoutClick: () => {
                 ApiService.logout();
