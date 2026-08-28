@@ -25,9 +25,16 @@ public class Task {
     @Column(nullable = false)
     private Priority priority = Priority.MEDIUM;
 
+    @Column(nullable = false)
+    private Integer position = 0;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private LocalDateTime dueDate;
 
@@ -41,6 +48,9 @@ public class Task {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        if (this.position == null) {
+            this.position = 0;
+        }
     }
 
     @PreUpdate
@@ -88,12 +98,28 @@ public class Task {
         this.priority = priority;
     }
 
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
+    }
+
     public Category getCategory() {
         return category;
     }
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public LocalDateTime getDueDate() {
