@@ -7,6 +7,7 @@ public class UserDTO {
     private Long id;
     private String username;
     private String fullName;
+    private String avatarColor;
     private Role role;
 
     public UserDTO() {}
@@ -16,6 +17,7 @@ public class UserDTO {
             this.id = user.getId();
             this.username = user.getUsername();
             this.fullName = user.getFullName();
+            this.avatarColor = user.getAvatarColor() != null ? user.getAvatarColor() : "#6366f1";
             this.role = user.getRole();
         }
     }
@@ -42,6 +44,14 @@ public class UserDTO {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public String getAvatarColor() {
+        return avatarColor;
+    }
+
+    public void setAvatarColor(String avatarColor) {
+        this.avatarColor = avatarColor;
     }
 
     public Role getRole() {

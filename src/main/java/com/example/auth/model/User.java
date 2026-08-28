@@ -18,6 +18,8 @@ public class User {
 
     private String fullName;
 
+    private String avatarColor;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -29,6 +31,15 @@ public class User {
         this.password = password;
         this.fullName = fullName;
         this.role = role;
+        this.avatarColor = "#6366f1";
+    }
+
+    public User(String username, String password, String fullName, Role role, String avatarColor) {
+        this.username = username;
+        this.password = password;
+        this.fullName = fullName;
+        this.role = role;
+        this.avatarColor = avatarColor;
     }
 
     public Long getId() {
@@ -61,6 +72,14 @@ public class User {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public String getAvatarColor() {
+        return avatarColor;
+    }
+
+    public void setAvatarColor(String avatarColor) {
+        this.avatarColor = avatarColor;
     }
 
     public Role getRole() {

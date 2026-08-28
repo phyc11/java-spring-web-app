@@ -1,7 +1,7 @@
 /**
  * Navbar Core Component
  */
-export function renderNavbar({ currentUser, currentView, onViewChange, onNewTaskClick, onAuditLogClick, onAnalyticsClick, onAuthClick, onLogoutClick }) {
+export function renderNavbar({ currentUser, currentView, onViewChange, onNewTaskClick, onAuditLogClick, onAnalyticsClick, onAuthClick, onLogoutClick, onProfileClick }) {
     const header = document.createElement('header');
     header.className = 'header-navbar';
 
@@ -33,8 +33,8 @@ export function renderNavbar({ currentUser, currentView, onViewChange, onNewTask
                 <button class="btn btn-secondary btn-sm" id="btn-analytics" title="Xem biểu đồ phân tích & xuất báo cáo Excel/CSV">
                     📈 Analytics & Báo Cáo
                 </button>
-                <div class="user-profile-badge">
-                    <span class="user-avatar">👤</span>
+                <div class="user-profile-badge" id="btn-user-profile" title="Xem hồ sơ cá nhân & đổi mật khẩu" style="cursor:pointer">
+                    <span class="user-avatar" style="background:${currentUser.avatarColor || '#6366f1'}">👤</span>
                     <div class="user-details">
                         <span class="user-name">${escapeHtml(currentUser.fullName || currentUser.username)}</span>
                         <span class="user-role-badge ${currentUser.role === 'ROLE_ADMIN' ? 'role-admin' : 'role-user'}">
@@ -63,6 +63,7 @@ export function renderNavbar({ currentUser, currentView, onViewChange, onNewTask
     if (currentUser) {
         header.querySelector('#btn-audit-log').addEventListener('click', onAuditLogClick);
         header.querySelector('#btn-analytics').addEventListener('click', onAnalyticsClick);
+        header.querySelector('#btn-user-profile').addEventListener('click', onProfileClick);
         header.querySelector('#btn-create-task').addEventListener('click', onNewTaskClick);
         header.querySelector('#btn-logout').addEventListener('click', onLogoutClick);
     } else {

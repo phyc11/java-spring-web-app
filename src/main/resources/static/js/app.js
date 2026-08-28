@@ -6,6 +6,7 @@ import { renderTaskCard } from './modules/task/TaskCard.js';
 import { renderTaskModal } from './modules/task/TaskModal.js';
 import { renderKanbanBoard } from './modules/kanban/KanbanBoard.js';
 import { renderAuthModal } from './modules/auth/AuthModal.js';
+import { renderProfileModal } from './modules/auth/ProfileModal.js';
 import { renderAuditLogDrawer } from './modules/audit/AuditLogDrawer.js';
 import { renderChartDashboard } from './modules/analytics/ChartDashboard.js';
 
@@ -33,6 +34,15 @@ class Application {
                 }
             });
             document.body.appendChild(this.authModal.element);
+
+            this.profileModal = renderProfileModal({
+                currentUser: this.currentUser,
+                onProfileUpdated: (updatedUser) => {
+                    this.currentUser = updatedUser;
+                    this.refreshAll();
+                }
+            });
+            document.body.appendChild(this.profileModal.element);
 
             this.auditLogDrawer = renderAuditLogDrawer();
             document.body.appendChild(this.auditLogDrawer.element);
@@ -74,6 +84,7 @@ class Application {
             onNewTaskClick: () => this.taskModal.open(),
             onAuditLogClick: () => this.auditLogDrawer.open(),
             onAnalyticsClick: () => this.chartDashboard.open(),
+            onProfileClick: () => this.profileModal.open(this.currentUser),
             onAuthClick: () => this.authModal.open(),
             onLogoutClick: () => {
                 ApiService.logout();

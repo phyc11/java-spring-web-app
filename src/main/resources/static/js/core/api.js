@@ -1,6 +1,6 @@
 /**
  * Core API Service Module
- * Handles REST API calls, JWT Bearer token authentication, Audit Logs, Analytics & File Export
+ * Handles REST API calls, JWT Bearer token authentication, Profile & Password management, Audit Logs, Analytics & File Export
  */
 const API_BASE = '/api';
 
@@ -29,7 +29,7 @@ export const ApiService = {
         return headers;
     },
 
-    // Auth endpoints
+    // Auth & Profile endpoints
     async login(username, password) {
         const res = await fetch(`${API_BASE}/auth/login`, {
             method: 'POST',
@@ -71,6 +71,24 @@ export const ApiService = {
         } catch {
             return null;
         }
+    },
+
+    async updateProfile(fullName, avatarColor) {
+        const res = await fetch(`${API_BASE}/auth/profile`, {
+            method: 'PUT',
+            headers: this.getHeaders(),
+            body: JSON.stringify({ fullName, avatarColor })
+        });
+        return await res.json();
+    },
+
+    async changePassword(oldPassword, newPassword) {
+        const res = await fetch(`${API_BASE}/auth/change-password`, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify({ oldPassword, newPassword })
+        });
+        return await res.json();
     },
 
     logout() {

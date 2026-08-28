@@ -4,12 +4,20 @@ import com.example.task.model.Priority;
 import com.example.task.model.Status;
 import com.example.task.model.Task;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 public class TaskDTO {
     private Long id;
+
+    @NotBlank(message = "Tiêu đề Task không được để trống!")
+    @Size(max = 255, message = "Tiêu đề Task tối đa 255 ký tự!")
     private String title;
+
+    @Size(max = 2000, message = "Mô tả Task tối đa 2000 ký tự!")
     private String description;
+
     private Status status;
     private Priority priority;
     private Long categoryId;

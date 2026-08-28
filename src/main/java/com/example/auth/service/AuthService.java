@@ -1,9 +1,7 @@
 package com.example.auth.service;
 
-import com.example.auth.dto.AuthResponse;
-import com.example.auth.dto.LoginRequest;
-import com.example.auth.dto.RegisterRequest;
-import com.example.auth.dto.UserDTO;
+import com.example.common.exception.ResourceNotFoundException;
+import com.example.auth.dto.*;
 import com.example.auth.model.Role;
 import com.example.auth.model.User;
 import com.example.auth.repository.UserRepository;
@@ -73,5 +71,32 @@ public class AuthService {
     public UserDTO getCurrentUser(String username) {
         User user = userRepository.findByUsername(username).orElse(null);
         return user != null ? new UserDTO(user) : null;
+    }
+
+    public UserDTO updateProfile(String username, UpdateProfileRequest request) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+
+        user.setFullName(request.getFullName());
+        if (request.getAvatarColor() != null && !request.getAvatarColor().isBlank()) {
+            user.setAvatarColor(request.getAvatarColor());
+        }
+
+        User updatedUser = userRepository.save(user);
+        return new UserDTO(updatedUser);
+    }
+
+    public void changePassword(String username, ChangePasswordRequest request) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+
+        // Verify old password against BCrypt hash
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Mật khẩu cũ không chính xác!");
+        }
+
+        // Encode and set new password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }

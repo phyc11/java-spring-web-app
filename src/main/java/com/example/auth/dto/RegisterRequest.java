@@ -2,10 +2,22 @@ package com.example.auth.dto;
 
 import com.example.auth.model.Role;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 public class RegisterRequest {
+
+    @NotBlank(message = "Tên đăng nhập không được để trống!")
+    @Size(min = 3, max = 50, message = "Tên đăng nhập từ 3 đến 50 ký tự!")
     private String username;
+
+    @NotBlank(message = "Mật khẩu không được để trống!")
+    @Size(min = 6, message = "Mật khẩu phải từ 6 ký tự trở lên!")
     private String password;
+
+    @NotBlank(message = "Họ và tên không được để trống!")
     private String fullName;
+
     private Role role;
 
     public RegisterRequest() {}
