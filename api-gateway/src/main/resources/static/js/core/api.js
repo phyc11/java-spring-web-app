@@ -1,6 +1,6 @@
 /**
  * Core API Service Module
- * Handles REST API calls, JWT Bearer token authentication, Profile & Password management, Audit Logs, Analytics & File Export
+ * Handles REST API calls, JWT Bearer token authentication, Profile & Password management, Notifications, Audit Logs, Analytics & File Export
  */
 const API_BASE = '/api';
 
@@ -93,6 +93,44 @@ export const ApiService = {
 
     logout() {
         this.setToken(null);
+    },
+
+    // Notification Endpoints
+    async getNotifications() {
+        const res = await fetch(`${API_BASE}/notifications`, { headers: this.getHeaders() });
+        const json = await res.json();
+        return json.data || [];
+    },
+
+    async getUnreadNotificationCount() {
+        const res = await fetch(`${API_BASE}/notifications/unread-count`, { headers: this.getHeaders() });
+        const json = await res.json();
+        return json.data ? json.data.unreadCount : 0;
+    },
+
+    async markNotificationAsRead(id) {
+        const res = await fetch(`${API_BASE}/notifications/${id}/read`, {
+            method: 'PATCH',
+            headers: this.getHeaders()
+        });
+        return await res.json();
+    },
+
+    async markAllNotificationsAsRead() {
+        const res = await fetch(`${API_BASE}/notifications/read-all`, {
+            method: 'POST',
+            headers: this.getHeaders()
+        });
+        return await res.json();
+    },
+
+    async sendTestNotification(title, message, type = 'SYSTEM') {
+        const res = await fetch(`${API_BASE}/notifications/send`, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify({ title, message, type })
+        });
+        return await res.json();
     },
 
     // Audit Log Endpoints
