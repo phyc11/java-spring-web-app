@@ -1,6 +1,6 @@
 /**
  * Core API Service Module
- * Handles REST API calls, JWT Bearer token authentication, Profile & Password management, Notifications, Audit Logs, Analytics & File Export
+ * Handles REST API calls, JWT Bearer token authentication, Profile & Password management, Notifications, Comments, Audit Logs, Analytics & File Export
  */
 const API_BASE = '/api';
 
@@ -93,6 +93,32 @@ export const ApiService = {
 
     logout() {
         this.setToken(null);
+    },
+
+    // Comment Endpoints
+    async getTaskComments(taskId) {
+        const res = await fetch(`${API_BASE}/comments/task/${taskId}`, { headers: this.getHeaders() });
+        const json = await res.json();
+        return json.data || [];
+    },
+
+    async postComment({ taskId, content, parentId = null }) {
+        const res = await fetch(`${API_BASE}/comments`, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify({ taskId, content, parentId })
+        });
+        const json = await res.json();
+        return json.data;
+    },
+
+    async deleteComment(id) {
+        const res = await fetch(`${API_BASE}/comments/${id}`, {
+            method: 'DELETE',
+            headers: this.getHeaders()
+        });
+        const json = await res.json();
+        return json.success;
     },
 
     // Notification Endpoints
