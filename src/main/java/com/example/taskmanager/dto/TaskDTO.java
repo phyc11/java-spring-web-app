@@ -11,10 +11,13 @@ public class TaskDTO {
     private String description;
     private Status status;
     private Priority priority;
+    private Integer position;
     private Long categoryId;
     private String categoryName;
     private String categoryColor;
     private String categoryIcon;
+    private Long userId;
+    private String username;
     private LocalDateTime dueDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -61,6 +64,14 @@ public class TaskDTO {
         this.priority = priority;
     }
 
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
+    }
+
     public Long getCategoryId() {
         return categoryId;
     }
@@ -91,6 +102,22 @@ public class TaskDTO {
 
     public void setCategoryIcon(String categoryIcon) {
         this.categoryIcon = categoryIcon;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public LocalDateTime getDueDate() {

@@ -1,11 +1,83 @@
 /**
  * TaskCraft API Service Module
- * Handles all backend communication with Spring Boot REST API
+ * Handles REST API calls and JWT Bearer token authentication
  */
 const API_BASE = '/api';
 
 export const ApiService = {
-    // Fetch all tasks with optional filters
+    getToken() {
+        return localStorage.getItem('taskcraft_token');
+    },
+
+    setToken(token) {
+        if (token) {
+            localStorage.setItem('taskcraft_token', token);
+        } else {
+            localStorage.removeItem('taskcraft_token');
+        }
+    },
+
+    getHeaders(extraHeaders = {}) {
+        const headers = {
+            'Content-Type': 'application/json',
+            ...extraHeaders
+        };
+        const token = this.getToken();
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        return headers;
+    },
+
+    // Auth endpoints
+    async login(username, password) {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const json = await res.json();
+        if (json.success && json.data && json.data.token) {
+            this.setToken(json.data.token);
+        }
+        return json;
+    },
+
+    async register(username, password, fullName, role = 'ROLE_USER') {
+        const res = await fetch(`${API_BASE}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, fullName, role })
+        });
+        const json = await res.json();
+        if (json.success && json.data && json.data.token) {
+            this.setToken(json.data.token);
+        }
+        return json;
+    },
+
+    async getMe() {
+        if (!this.getToken()) return null;
+        try {
+            const res = await fetch(`${API_BASE}/auth/me`, {
+                headers: this.getHeaders()
+            });
+            if (res.status === 401) {
+                this.setToken(null);
+                return null;
+            }
+            const json = await res.json();
+            return json.data;
+        } catch {
+            return null;
+        }
+    },
+
+    logout() {
+        this.setToken(null);
+    },
+
+    // Task Endpoints
     async getTasks(params = {}) {
         const query = new URLSearchParams();
         if (params.status) query.append('status', params.status);
@@ -14,62 +86,67 @@ export const ApiService = {
         if (params.search) query.append('search', params.search);
 
         const url = `${API_BASE}/tasks${query.toString() ? '?' + query.toString() : ''}`;
-        const res = await fetch(url);
+        const res = await fetch(url, { headers: this.getHeaders() });
         const json = await res.json();
         return json.data || [];
     },
 
-    // Fetch dashboard stats
     async getStats() {
-        const res = await fetch(`${API_BASE}/tasks/stats`);
+        const res = await fetch(`${API_BASE}/tasks/stats`, { headers: this.getHeaders() });
         const json = await res.json();
         return json.data || {};
     },
 
-    // Fetch all categories
     async getCategories() {
-        const res = await fetch(`${API_BASE}/categories`);
+        const res = await fetch(`${API_BASE}/categories`, { headers: this.getHeaders() });
         const json = await res.json();
         return json.data || [];
     },
 
-    // Create a new task
     async createTask(taskData) {
         const res = await fetch(`${API_BASE}/tasks`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getHeaders(),
             body: JSON.stringify(taskData)
         });
         const json = await res.json();
         return json.data;
     },
 
-    // Update existing task
     async updateTask(id, taskData) {
         const res = await fetch(`${API_BASE}/tasks/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getHeaders(),
             body: JSON.stringify(taskData)
         });
         const json = await res.json();
         return json.data;
     },
 
-    // Update task status (TODO, IN_PROGRESS, COMPLETED)
     async updateTaskStatus(id, status) {
         const res = await fetch(`${API_BASE}/tasks/${id}/status`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getHeaders(),
             body: JSON.stringify({ status })
         });
         const json = await res.json();
         return json.data;
     },
 
-    // Delete task
+    async moveTask(id, status, position) {
+        const res = await fetch(`${API_BASE}/tasks/${id}/move`, {
+            method: 'PATCH',
+            headers: this.getHeaders(),
+            body: JSON.stringify({ status, position })
+        });
+        const json = await res.json();
+        return json.data;
+    },
+
     async deleteTask(id) {
         const res = await fetch(`${API_BASE}/tasks/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: this.getHeaders()
         });
         const json = await res.json();
         return json.success;
