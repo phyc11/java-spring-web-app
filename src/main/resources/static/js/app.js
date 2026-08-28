@@ -7,6 +7,7 @@ import { renderKanbanBoard } from './components/KanbanBoard.js';
 import { renderTaskModal } from './components/TaskModal.js';
 import { renderAuthModal } from './components/AuthModal.js';
 import { renderAuditLogDrawer } from './components/AuditLogDrawer.js';
+import { renderChartDashboard } from './components/ChartDashboard.js';
 
 class Application {
     constructor() {
@@ -35,6 +36,9 @@ class Application {
 
             this.auditLogDrawer = renderAuditLogDrawer();
             document.body.appendChild(this.auditLogDrawer.element);
+
+            this.chartDashboard = renderChartDashboard();
+            document.body.appendChild(this.chartDashboard.element);
 
             this.categories = await ApiService.getCategories();
 
@@ -69,6 +73,7 @@ class Application {
             },
             onNewTaskClick: () => this.taskModal.open(),
             onAuditLogClick: () => this.auditLogDrawer.open(),
+            onAnalyticsClick: () => this.chartDashboard.open(),
             onAuthClick: () => this.authModal.open(),
             onLogoutClick: () => {
                 ApiService.logout();

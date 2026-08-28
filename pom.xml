@@ -20,6 +20,7 @@
     <properties>
         <java.version>11</java.version>
         <jjwt.version>0.11.5</jjwt.version>
+        <poi.version>5.2.3</poi.version>
     </properties>
     
     <dependencies>
@@ -52,6 +53,13 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>${jjwt.version}</version>
             <scope>runtime</scope>
+        </dependency>
+
+        <!-- Apache POI for Excel Export -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
         </dependency>
 
         <!-- Spring Data JPA -->
