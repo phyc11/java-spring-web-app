@@ -1,6 +1,6 @@
 /**
  * Core API Service Module
- * Handles REST API calls, JWT Bearer token authentication, Profile & Password management, Notifications, Comments, Audit Logs, Analytics & File Export
+ * Handles REST API calls, JWT Bearer token authentication, Profile & Password management, Notifications, Comments, Analytics & File Export
  */
 const API_BASE = '/api';
 
@@ -157,13 +157,6 @@ export const ApiService = {
             body: JSON.stringify({ title, message, type })
         });
         return await res.json();
-    },
-
-    // Audit Log Endpoints
-    async getAuditLogs() {
-        const res = await fetch(`${API_BASE}/audit-logs`, { headers: this.getHeaders() });
-        const json = await res.json();
-        return json.data || [];
     },
 
     // Analytics & Export Endpoints

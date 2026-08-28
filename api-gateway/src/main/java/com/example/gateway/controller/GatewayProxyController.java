@@ -22,9 +22,6 @@ public class GatewayProxyController {
     @Value("${task-service.url:http://localhost:8082}")
     private String taskServiceUrl;
 
-    @Value("${audit-service.url:http://localhost:8083}")
-    private String auditServiceUrl;
-
     @Value("${analytics-service.url:http://localhost:8084}")
     private String analyticsServiceUrl;
 
@@ -38,7 +35,7 @@ public class GatewayProxyController {
         this.restTemplate = restTemplate;
     }
 
-    @RequestMapping({"/api/auth/**", "/api/tasks/**", "/api/categories/**", "/api/audit-logs/**", "/api/analytics/**", "/api/export/**", "/api/notifications/**", "/api/comments/**"})
+    @RequestMapping({"/api/auth/**", "/api/tasks/**", "/api/categories/**", "/api/analytics/**", "/api/export/**", "/api/notifications/**", "/api/comments/**"})
     public ResponseEntity<byte[]> proxyRequest(@RequestBody(required = false) byte[] body,
                                               HttpMethod method,
                                               HttpServletRequest request) {
@@ -53,8 +50,6 @@ public class GatewayProxyController {
             targetBaseUrl = authServiceUrl;
         } else if (requestPath.startsWith("/api/tasks") || requestPath.startsWith("/api/categories")) {
             targetBaseUrl = taskServiceUrl;
-        } else if (requestPath.startsWith("/api/audit-logs")) {
-            targetBaseUrl = auditServiceUrl;
         } else if (requestPath.startsWith("/api/notifications")) {
             targetBaseUrl = notificationServiceUrl;
         } else if (requestPath.startsWith("/api/comments")) {

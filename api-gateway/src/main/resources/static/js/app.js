@@ -7,9 +7,7 @@ import { renderTaskModal } from './modules/task/TaskModal.js';
 import { renderKanbanBoard } from './modules/kanban/KanbanBoard.js';
 import { renderAuthModal } from './modules/auth/AuthModal.js';
 import { renderProfileModal } from './modules/auth/ProfileModal.js';
-import { renderAuditLogDrawer } from './modules/audit/AuditLogDrawer.js';
 import { renderChartDashboard } from './modules/analytics/ChartDashboard.js';
-import { createNotificationModal } from './modules/notification/NotificationModal.js';
 
 class Application {
     constructor() {
@@ -20,8 +18,6 @@ class Application {
         this.tasks = [];
         this.stats = {};
         this.currentFilter = {};
-        this.unreadNotifications = 0;
-        this.sseEventSource = null;
     }
 
     async init() {
@@ -47,14 +43,6 @@ class Application {
             });
             document.body.appendChild(this.profileModal.element);
 
-            this.notificationModal = createNotificationModal({
-                onNotificationRead: () => this.refreshNotificationCount()
-            });
-            document.body.appendChild(this.notificationModal.element);
-
-            this.auditLogDrawer = renderAuditLogDrawer();
-            document.body.appendChild(this.auditLogDrawer.element);
-
             this.chartDashboard = renderChartDashboard();
             document.body.appendChild(this.chartDashboard.element);
 
@@ -66,8 +54,6 @@ class Application {
             // If not logged in, show Auth Modal automatically
             if (!this.currentUser) {
                 this.authModal.open();
-            } else {
-                this.initSseStream();
             }
 
             // Build UI Layout
@@ -79,29 +65,6 @@ class Application {
         }
     }
 
-    initSseStream() {
-        if (!this.currentUser) return;
-        if (this.sseEventSource) this.sseEventSource.close();
-
-        try {
-            this.sseEventSource = new EventSource('/api/notifications/stream');
-            this.sseEventSource.addEventListener('NOTIFICATION', (event) => {
-                const dto = JSON.parse(event.data);
-                this.refreshNotificationCount();
-                if (this.notificationModal) this.notificationModal.loadNotifications();
-            });
-        } catch (e) {
-            console.warn("SSE connection error:", e);
-        }
-    }
-
-    async refreshNotificationCount() {
-        if (this.currentUser) {
-            this.unreadNotifications = await ApiService.getUnreadNotificationCount();
-            this.renderLayout();
-        }
-    }
-
     renderLayout() {
         this.appContainer.innerHTML = '';
 
@@ -109,22 +72,18 @@ class Application {
         const navbar = renderNavbar({
             currentUser: this.currentUser,
             currentView: this.currentView,
-            unreadNotifications: this.unreadNotifications,
             onViewChange: (view) => {
                 this.currentView = view;
                 this.renderLayout();
                 this.renderContent();
             },
             onNewTaskClick: () => this.taskModal.open(),
-            onNotificationClick: () => this.notificationModal.show(),
-            onAuditLogClick: () => this.auditLogDrawer.open(),
             onAnalyticsClick: () => this.chartDashboard.open(),
             onProfileClick: () => this.profileModal.open(this.currentUser),
             onAuthClick: () => this.authModal.open(),
             onLogoutClick: () => {
                 ApiService.logout();
                 this.currentUser = null;
-                if (this.sseEventSource) this.sseEventSource.close();
                 this.refreshAll();
             }
         });
@@ -145,10 +104,6 @@ class Application {
 
     async refreshAll() {
         this.categories = await ApiService.getCategories();
-        if (this.currentUser) {
-            this.unreadNotifications = await ApiService.getUnreadNotificationCount();
-            this.initSseStream();
-        }
         this.renderLayout();
         await this.refreshData();
     }
@@ -164,7 +119,6 @@ class Application {
 
         this.stats = await ApiService.getStats();
         this.tasks = await ApiService.getTasks(this.currentFilter);
-        this.unreadNotifications = await ApiService.getUnreadNotificationCount();
         this.renderStats();
         this.renderContent();
     }
@@ -236,30 +190,25 @@ class Application {
     async handleSaveTask(taskData) {
         if (taskData.id) {
             await ApiService.updateTask(taskData.id, taskData);
-            await ApiService.sendTestNotification("Công Việc Cập Nhật", `Task "${taskData.title}" đã được chỉnh sửa.`);
         } else {
             await ApiService.createTask(taskData);
-            await ApiService.sendTestNotification("Task Mới Đã Tạo", `Task "${taskData.title}" vừa được thêm vào hệ thống.`);
         }
         await this.refreshData();
     }
 
     async handleStatusToggle(id, newStatus) {
         await ApiService.updateTaskStatus(id, newStatus);
-        await ApiService.sendTestNotification("Đổi Trạng Thái Task", `Task ID #${id} chuyển sang trạng thái ${newStatus}`);
         await this.refreshData();
     }
 
     async handleTaskDrop(id, targetStatus) {
         await ApiService.moveTask(id, targetStatus);
-        await ApiService.sendTestNotification("Di Chuyển Thẻ Kanban", `Task ID #${id} được thả sang cột ${targetStatus}`);
         await this.refreshData();
     }
 
     async handleDeleteTask(id) {
         if (confirm("Bạn có chắc chắn muốn xóa task này?")) {
             await ApiService.deleteTask(id);
-            await ApiService.sendTestNotification("Xóa Task", `Task ID #${id} đã bị xóa khỏi hệ thống.`);
             await this.refreshData();
         }
     }

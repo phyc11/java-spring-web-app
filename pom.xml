@@ -17,7 +17,6 @@
         <module>api-gateway</module>
         <module>auth-service</module>
         <module>task-service</module>
-        <module>audit-service</module>
         <module>analytics-service</module>
         <module>notification-service</module>
         <module>comment-service</module>

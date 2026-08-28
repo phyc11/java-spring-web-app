@@ -1,7 +1,7 @@
 /**
  * Navbar Core Component
  */
-export function renderNavbar({ currentUser, currentView, unreadNotifications = 0, onViewChange, onNewTaskClick, onNotificationClick, onAuditLogClick, onAnalyticsClick, onAuthClick, onLogoutClick, onProfileClick }) {
+export function renderNavbar({ currentUser, currentView, onViewChange, onNewTaskClick, onAnalyticsClick, onAuthClick, onLogoutClick, onProfileClick }) {
     const header = document.createElement('header');
     header.className = 'header-navbar';
 
@@ -27,13 +27,6 @@ export function renderNavbar({ currentUser, currentView, unreadNotifications = 0
 
         <div class="navbar-actions">
             ${currentUser ? `
-                <button class="btn btn-secondary btn-sm" id="btn-notifications" title="Xem thông báo hệ thống" style="position:relative;">
-                    🔔
-                    ${unreadNotifications > 0 ? `<span class="notification-badge" style="position:absolute; top:-4px; right:-4px; background:#ef4444; color:#fff; font-size:0.7rem; font-weight:bold; border-radius:10px; padding:2px 6px;">${unreadNotifications}</span>` : ''}
-                </button>
-                <button class="btn btn-secondary btn-sm" id="btn-audit-log" title="Xem lịch sử hoạt động system">
-                    📜 Lịch Sử
-                </button>
                 <button class="btn btn-secondary btn-sm" id="btn-analytics" title="Xem biểu đồ phân tích & xuất báo cáo Excel/CSV">
                     📈 Analytics & Báo Cáo
                 </button>
@@ -65,8 +58,6 @@ export function renderNavbar({ currentUser, currentView, unreadNotifications = 0
     header.querySelector('#btn-view-kanban').addEventListener('click', () => onViewChange('kanban'));
 
     if (currentUser) {
-        header.querySelector('#btn-notifications').addEventListener('click', onNotificationClick);
-        header.querySelector('#btn-audit-log').addEventListener('click', onAuditLogClick);
         header.querySelector('#btn-analytics').addEventListener('click', onAnalyticsClick);
         header.querySelector('#btn-user-profile').addEventListener('click', onProfileClick);
         header.querySelector('#btn-create-task').addEventListener('click', onNewTaskClick);
